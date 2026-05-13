@@ -26,6 +26,7 @@ async function run() {
     await client.connect();
     const db = client.db('wonderlust');
     const destinationsCollection = db.collection('destinations');
+    const bookingsCollection = db.collection('bookings');
     app.get('/destination', async (req, res) => {
       const result = await destinationsCollection.find().toArray();
       res.json(result);
@@ -63,6 +64,26 @@ async function run() {
       const result = await destinationsCollection.deleteOne({
         _id: new ObjectId(id),
       });
+      res.json(result);
+    });
+
+    app.get('/booking/:userId', async (req, res) => {
+      const { userId } = req.params;
+      const result = await bookingsCollection
+        .find({ userId: userId })
+        .toArray();
+      res.json(result);
+    });
+    app.delete('/booking/:bookingId', async (req, res) => {
+      const { bookingId } = req.params;
+      const result = await bookingsCollection.deleteOne({
+        _id: new ObjectId(bookingId),
+      });
+      res.json(result);
+    });
+    app.post('/booking', async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingsCollection.insertOne(bookingData);
       res.json(result);
     });
     // Send a ping to confirm a successful connection
